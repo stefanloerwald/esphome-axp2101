@@ -33,6 +33,18 @@ namespace axp2101 {
 
 static const char *TAG = "axp2101.sensor";
 
+void AXP2101Component::power_lcd(bool on)
+{
+    if (on)
+    {
+        PMU.enableALDO4();
+    }
+    else 
+    {
+        PMU.disableALDO4();
+    }
+}
+
 void AXP2101Component::setup()
 {
     ESP_LOGCONFIG(TAG, "getID:0x%x", PMU.getChipID());
