@@ -45,6 +45,33 @@ void AXP2101Component::power_lcd(bool on)
     }
 }
 
+void AXP2101Component::toggle_lcd()
+{
+    if (lcd_state)
+    {
+        PMU.enableALDO4();
+    }
+    else 
+    {
+        PMU.disableALDO4();
+    }
+    lcd_state = !lcd_state;
+}
+
+
+void AXP2101Component::toggle_backlight()
+{
+    if (backlight_state)
+    {
+        PMU.enableBLDO1();
+    }
+    else 
+    {
+        PMU.disableBLDO1();
+    }
+    backlight_state = !backlight_state;
+}
+
 void AXP2101Component::setup()
 {
     ESP_LOGCONFIG(TAG, "getID:0x%x", PMU.getChipID());
