@@ -58,6 +58,8 @@ public:
   void update() override;
 
 private:
+    bool lcd_state;
+    bool backlight_state;
     static std::string GetStartupReason();
 
 protected:
