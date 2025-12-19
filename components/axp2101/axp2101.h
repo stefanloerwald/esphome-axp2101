@@ -43,6 +43,8 @@ public:
   void set_blue_led(bool on);
   void set_speaker_enabled(bool on);
   void power_lcd(bool on);
+  void toggle_lcd();
+  void toggle_backlight();
       // -- sleep
   void SetSleep(void);
   void DeepSleep(uint64_t time_in_us = 0);
