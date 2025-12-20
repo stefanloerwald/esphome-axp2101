@@ -832,40 +832,40 @@ void AXP2101Component::SetChargeCurrent(uint8_t current)
 void AXP2101Component::PowerOff()
 {
     // Turn off the charging indicator to save power
-    power.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+    PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
 
     // Turn off ADC data monitoring to save power
-    power.disableTemperatureMeasure();
+    PMU.disableTemperatureMeasure();
     // Enable internal ADC detection
-    power.disableBattDetection();
-    power.disableVbusVoltageMeasure();
-    power.disableBattVoltageMeasure();
-    power.disableSystemVoltageMeasure();
+    PMU.disableBattDetection();
+    PMU.disableVbusVoltageMeasure();
+    PMU.disableBattVoltageMeasure();
+    PMU.disableSystemVoltageMeasure();
 
 
     // Enable PMU sleep
-    power.enableSleep();
+    PMU.enableSleep();
 
     // Turn off the power output of other channels
-    power.disableDC2();
-    power.disableDC3();
-    power.disableDC4();
-    power.disableDC5();
-    power.disableALDO1();
-    power.disableALDO2();
-    power.disableALDO3();
-    power.disableALDO4();
-    power.disableBLDO1();
-    power.disableBLDO2();
-    power.disableCPUSLDO();
-    power.disableDLDO1();
-    power.disableDLDO2();
+    PMU.disableDC2();
+    PMU.disableDC3();
+    PMU.disableDC4();
+    PMU.disableDC5();
+    PMU.disableALDO1();
+    PMU.disableALDO2();
+    PMU.disableALDO3();
+    PMU.disableALDO4();
+    PMU.disableBLDO1();
+    PMU.disableBLDO2();
+    PMU.disableCPUSLDO();
+    PMU.disableDLDO1();
+    PMU.disableDLDO2();
 
     // Clear PMU Interrupt Status Register
-    power.clearIrqStatus();
+    PMU.clearIrqStatus();
 
     // Send IRQ wakeup command
-    power.enableWakeup();
+    PMU.enableWakeup();
     // Set ESP32 to wake up externally
     esp_sleep_enable_ext0_wakeup((gpio_num_t )pmu_irq_pin, LOW);
 
