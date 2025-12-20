@@ -831,7 +831,47 @@ void AXP2101Component::SetChargeCurrent(uint8_t current)
 
 void AXP2101Component::PowerOff()
 {
-    Write1Byte(0x32, Read8bit(0x32) | 0x80);
+    // Turn off the charging indicator to save power
+    power.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+
+    // Turn off ADC data monitoring to save power
+    power.disableTemperatureMeasure();
+    // Enable internal ADC detection
+    power.disableBattDetection();
+    power.disableVbusVoltageMeasure();
+    power.disableBattVoltageMeasure();
+    power.disableSystemVoltageMeasure();
+
+
+    // Enable PMU sleep
+    power.enableSleep();
+
+    // Turn off the power output of other channels
+    power.disableDC2();
+    power.disableDC3();
+    power.disableDC4();
+    power.disableDC5();
+    power.disableALDO1();
+    power.disableALDO2();
+    power.disableALDO3();
+    power.disableALDO4();
+    power.disableBLDO1();
+    power.disableBLDO2();
+    power.disableCPUSLDO();
+    power.disableDLDO1();
+    power.disableDLDO2();
+
+    // Clear PMU Interrupt Status Register
+    power.clearIrqStatus();
+
+    // Send IRQ wakeup command
+    power.enableWakeup();
+    // Set ESP32 to wake up externally
+    esp_sleep_enable_ext0_wakeup((gpio_num_t )pmu_irq_pin, LOW);
+
+    // Enable ESP32 sleep
+    esp_deep_sleep_start();
+    //Write1Byte(0x32, Read8bit(0x32) | 0x80);
 }
 
 
