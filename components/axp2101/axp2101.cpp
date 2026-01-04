@@ -20,7 +20,7 @@
 #endif
 
 bool  power_flag = 0;
-XPowerspower power;
+XPowersPMU power;
 
 const uint8_t i2c_sda = CONFIG_power_SDA;
 const uint8_t i2c_scl = CONFIG_power_SCL;
