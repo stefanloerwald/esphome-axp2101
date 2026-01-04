@@ -35,6 +35,7 @@ static const char *TAG = "axp2101.sensor";
 
 void AXP2101Component::power_lcd(bool on)
 {
+    ESP_LOGD(TAG, "power_lcd");
     if (on)
     {
         PMU.enableALDO4();
@@ -47,6 +48,7 @@ void AXP2101Component::power_lcd(bool on)
 
 void AXP2101Component::toggle_lcd()
 {
+    ESP_LOGD(TAG, "toggle_lcd");
     if (lcd_state)
     {
         PMU.enableALDO4();
@@ -61,6 +63,7 @@ void AXP2101Component::toggle_lcd()
 
 void AXP2101Component::toggle_backlight()
 {
+    ESP_LOGD(TAG, "toggle_backlight");
     if (backlight_state)
     {
         PMU.enableBLDO1();
@@ -74,6 +77,7 @@ void AXP2101Component::toggle_backlight()
 
 void AXP2101Component::setup()
 {
+    ESP_LOGD(TAG, "setup");
     ESP_LOGCONFIG(TAG, "getID:0x%x", PMU.getChipID());
 
     // Set the minimum common working voltage of the PMU VBUS input,
@@ -331,6 +335,7 @@ void AXP2101Component::setup()
 
 // Screen enable
 void AXP2101Component::set_lcd_enabled(bool on) {
+    ESP_LOGD(TAG, "set_lcd_enabled");
     if (on) {
         PMU.enableBLDO1();  // backlight on
     } else {
@@ -340,6 +345,7 @@ void AXP2101Component::set_lcd_enabled(bool on) {
 
 // LED on / off
 void AXP2101Component::set_blue_led(bool on) {
+    ESP_LOGD(TAG, "set_blue_led");
   if (on) {
     PMU.setChargingLedMode(XPOWERS_CHG_LED_ON);
   } else {
@@ -349,6 +355,7 @@ void AXP2101Component::set_blue_led(bool on) {
 
 // SPEAKER on / off
 void AXP2101Component::set_speaker_enabled(bool on) {
+    ESP_LOGD(TAG, "set_speaker_enabled");
     if (on) {
         PMU.enableALDO3();  // speaker on
     } else {
@@ -358,6 +365,7 @@ void AXP2101Component::set_speaker_enabled(bool on) {
 
 
 void AXP2101Component::dump_config() {
+    ESP_LOGD(TAG, "dump_config");
   ESP_LOGCONFIG(TAG, "AXP2101:");
   LOG_I2C_DEVICE(this);
   LOG_SENSOR("  ", "Battery Voltage", this->batteryvoltage_sensor_);
@@ -365,9 +373,13 @@ void AXP2101Component::dump_config() {
   LOG_BINARY_SENSOR("  ", "Battery Charging", this->batterycharging_bsensor_);
 }
 
-float AXP2101Component::get_setup_priority() const { return setup_priority::DATA; }
+float AXP2101Component::get_setup_priority() const { 
+    ESP_LOGD(TAG, "get_setup_priority");
+    return setup_priority::DATA; 
+}
 
 void AXP2101Component::update() {
+    ESP_LOGD(TAG, "update");
 
     if (this->batterylevel_sensor_ != nullptr) {
       float vbat = PMU.getBattVoltage();
@@ -403,11 +415,13 @@ void AXP2101Component::update() {
 
 void AXP2101Component::Write1Byte( uint8_t Addr ,  uint8_t Data )
 {
+    ESP_LOGD(TAG, "Write1Byte");
     this->write_byte(Addr, Data);
 }
 
 uint8_t AXP2101Component::Read8bit( uint8_t Addr )
 {
+    ESP_LOGD(TAG, "Read8Bit");
     uint8_t data;
     this->read_byte(Addr, &data);
     return data;
@@ -415,6 +429,7 @@ uint8_t AXP2101Component::Read8bit( uint8_t Addr )
 
 uint16_t AXP2101Component::Read12Bit( uint8_t Addr)
 {
+    ESP_LOGD(TAG, "Read12Bit");
     uint16_t Data = 0;
     uint8_t buf[2];
     ReadBuff(Addr,2,buf);
@@ -424,6 +439,7 @@ uint16_t AXP2101Component::Read12Bit( uint8_t Addr)
 
 uint16_t AXP2101Component::Read13Bit( uint8_t Addr)
 {
+    ESP_LOGD(TAG, "Read13Bit");
     uint16_t Data = 0;
     uint8_t buf[2];
     ReadBuff(Addr,2,buf);
@@ -433,6 +449,7 @@ uint16_t AXP2101Component::Read13Bit( uint8_t Addr)
 
 uint16_t AXP2101Component::Read16bit( uint8_t Addr )
 {
+    ESP_LOGD(TAG, "Read16Bit");
     uint32_t ReData = 0;
     uint8_t Buff[2];
     this->read_bytes(Addr, Buff, sizeof(Buff));
@@ -446,6 +463,7 @@ uint16_t AXP2101Component::Read16bit( uint8_t Addr )
 
 uint32_t AXP2101Component::Read24bit( uint8_t Addr )
 {
+    ESP_LOGD(TAG, "Read24bit");
     uint32_t ReData = 0;
     uint8_t Buff[3];
     this->read_bytes(Addr, Buff, sizeof(Buff));
@@ -459,6 +477,7 @@ uint32_t AXP2101Component::Read24bit( uint8_t Addr )
 
 uint32_t AXP2101Component::Read32bit( uint8_t Addr )
 {
+    ESP_LOGD(TAG, "Read32bit");
     uint32_t ReData = 0;
     uint8_t Buff[4];
     this->read_bytes(Addr, Buff, sizeof(Buff));
@@ -472,10 +491,12 @@ uint32_t AXP2101Component::Read32bit( uint8_t Addr )
 
 void AXP2101Component::ReadBuff( uint8_t Addr , uint8_t Size , uint8_t *Buff )
 {
+    ESP_LOGD(TAG, "ReadBuff");
     this->read_bytes(Addr, Buff, Size);
 }
 
 void AXP2101Component::UpdateBrightness() {
+    ESP_LOGD(TAG, "UpdateBrightness");
     if (brightness_ == curr_brightness_) return;
     ESP_LOGD(TAG, "Brightness=%f (Curr: %f)", brightness_, curr_brightness_);
     curr_brightness_ = brightness_;
@@ -499,6 +520,7 @@ void AXP2101Component::UpdateBrightness() {
 
 bool AXP2101Component::GetBatState()
 {
+    ESP_LOGD(TAG, "GetBatState");
     if( Read8bit(0x01) | 0x20 )
         return true;
     else
@@ -507,6 +529,7 @@ bool AXP2101Component::GetBatState()
 
 uint8_t AXP2101Component::GetBatData()
 {
+    ESP_LOGD(TAG, "GetBatData");
     return Read8bit(0x75);
 }
 //---------coulombcounter_from_here---------
@@ -566,6 +589,7 @@ float AXP2101Component::GetCoulombData(void)
 //----------coulomb_end_at_here----------
 
 uint16_t AXP2101Component::GetVbatData(void){
+    ESP_LOGD(TAG, "GetVbatData");
 
     uint16_t vbat = 0;
     uint8_t buf[2];
@@ -576,6 +600,7 @@ uint16_t AXP2101Component::GetVbatData(void){
 
 uint16_t AXP2101Component::GetVinData(void)
 {
+    ESP_LOGD(TAG, "GetVinData");
     uint16_t vin = 0;
     uint8_t buf[2];
     ReadBuff(0x56,2,buf);
@@ -585,6 +610,7 @@ uint16_t AXP2101Component::GetVinData(void)
 
 uint16_t AXP2101Component::GetIinData(void)
 {
+    ESP_LOGD(TAG, "GetIinData");
     uint16_t iin = 0;
     uint8_t buf[2];
     ReadBuff(0x58,2,buf);
@@ -594,6 +620,7 @@ uint16_t AXP2101Component::GetIinData(void)
 
 uint16_t AXP2101Component::GetVusbinData(void)
 {
+    ESP_LOGD(TAG, "GetVusbinData");
     uint16_t vin = 0;
     uint8_t buf[2];
     ReadBuff(0x5a,2,buf);
@@ -603,6 +630,7 @@ uint16_t AXP2101Component::GetVusbinData(void)
 
 uint16_t AXP2101Component::GetIusbinData(void)
 {
+    ESP_LOGD(TAG, "GetIusbinData");
     uint16_t iin = 0;
     uint8_t buf[2];
     ReadBuff(0x5C,2,buf);
@@ -612,6 +640,7 @@ uint16_t AXP2101Component::GetIusbinData(void)
 
 uint16_t AXP2101Component::GetIchargeData(void)
 {
+    ESP_LOGD(TAG, "GetIchargeData");
     uint16_t icharge = 0;
     uint8_t buf[2];
     ReadBuff(0x7A,2,buf);
@@ -621,6 +650,7 @@ uint16_t AXP2101Component::GetIchargeData(void)
 
 uint16_t AXP2101Component::GetIdischargeData(void)
 {
+    ESP_LOGD(TAG, "GetIdischargeData");
     uint16_t idischarge = 0;
     uint8_t buf[2];
     ReadBuff(0x7C,2,buf);
@@ -630,6 +660,7 @@ uint16_t AXP2101Component::GetIdischargeData(void)
 
 uint16_t AXP2101Component::GetTempData(void)
 {
+    ESP_LOGD(TAG, "GetTempData");
     uint16_t temp = 0;
     uint8_t buf[2];
     ReadBuff(0x5e,2,buf);
@@ -639,6 +670,7 @@ uint16_t AXP2101Component::GetTempData(void)
 
 uint32_t AXP2101Component::GetPowerbatData(void)
 {
+    ESP_LOGD(TAG, "GetPowerbatData");
     uint32_t power = 0;
     uint8_t buf[3];
     ReadBuff(0x70,2,buf);
@@ -648,6 +680,7 @@ uint32_t AXP2101Component::GetPowerbatData(void)
 
 uint16_t AXP2101Component::GetVapsData(void)
 {
+    ESP_LOGD(TAG, "GetVapsData");
     uint16_t vaps = 0;
     uint8_t buf[2];
     ReadBuff(0x7e,2,buf);
@@ -657,6 +690,7 @@ uint16_t AXP2101Component::GetVapsData(void)
 
 void AXP2101Component::SetSleep(void)
 {
+    ESP_LOGD(TAG, "SetSleep");
     Write1Byte(0x31 , Read8bit(0x31) | ( 1 << 3)); // Power off voltag 3.0v
     Write1Byte(0x90 , Read8bit(0x90) | 0x07); // GPIO1 floating
     Write1Byte(0x82, 0x00); // Disable ADCs
@@ -667,6 +701,7 @@ void AXP2101Component::SetSleep(void)
 // -- sleep
 void AXP2101Component::DeepSleep(uint64_t time_in_us)
 {
+    ESP_LOGD(TAG, "DeepSleep");
     SetSleep();
     esp_sleep_enable_ext0_wakeup((gpio_num_t)39, 0 /* LOW */);
     if (time_in_us > 0)
@@ -682,6 +717,7 @@ void AXP2101Component::DeepSleep(uint64_t time_in_us)
 
 void AXP2101Component::LightSleep(uint64_t time_in_us)
 {
+    ESP_LOGD(TAG, "LightSleep");
     if (time_in_us > 0)
     {
         esp_sleep_enable_timer_wakeup(time_in_us);
@@ -696,6 +732,7 @@ void AXP2101Component::LightSleep(uint64_t time_in_us)
 // 0 not press, 0x01 long press, 0x02 press
 uint8_t AXP2101Component::GetBtnPress()
 {
+    ESP_LOGD(TAG, "GetBtnPress");
     uint8_t state = Read8bit(0x46);
     if(state)
     {
@@ -706,11 +743,13 @@ uint8_t AXP2101Component::GetBtnPress()
 
 uint8_t AXP2101Component::GetWarningLevel(void)
 {
+    ESP_LOGD(TAG, "GetWarningLevel");
     return Read8bit(0x47) & 0x01;
 }
 
 float AXP2101Component::GetBatCurrent()
 {
+    ESP_LOGD(TAG, "GetBatCurrent");
     float ADCLSB = 0.5;
     uint16_t CurrentIn = Read13Bit( 0x7A );
     uint16_t CurrentOut = Read13Bit( 0x7C );
@@ -719,6 +758,7 @@ float AXP2101Component::GetBatCurrent()
 
 float AXP2101Component::GetVinVoltage()
 {
+    ESP_LOGD(TAG, "GetVinVoltage");
     float ADCLSB = 1.7 / 1000.0;
     uint16_t ReData = Read12Bit( 0x56 );
     return ReData * ADCLSB;
@@ -726,6 +766,7 @@ float AXP2101Component::GetVinVoltage()
 
 float AXP2101Component::GetVinCurrent()
 {
+    ESP_LOGD(TAG, "GetVinCurrent");
     float ADCLSB = 0.625;
     uint16_t ReData = Read12Bit( 0x58 );
     return ReData * ADCLSB;
@@ -733,6 +774,7 @@ float AXP2101Component::GetVinCurrent()
 
 float AXP2101Component::GetVBusVoltage()
 {
+    ESP_LOGD(TAG, "GetVBusVoltage");
     float ADCLSB = 1.7 / 1000.0;
     uint16_t ReData = Read12Bit( 0x5A );
     return ReData * ADCLSB;
@@ -740,6 +782,7 @@ float AXP2101Component::GetVBusVoltage()
 
 float AXP2101Component::GetVBusCurrent()
 {
+    ESP_LOGD(TAG, "GetVBusCurrent");
     float ADCLSB = 0.375;
     uint16_t ReData = Read12Bit( 0x5C );
     return ReData * ADCLSB;
@@ -747,6 +790,7 @@ float AXP2101Component::GetVBusCurrent()
 
 float AXP2101Component::GetTempInAXP2101()
 {
+    ESP_LOGD(TAG, "GetTempInAXP2101");
     float ADCLSB = 0.1;
     const float OFFSET_DEG_C = -144.7;
     uint16_t ReData = Read12Bit( 0x5E );
@@ -755,6 +799,7 @@ float AXP2101Component::GetTempInAXP2101()
 
 float AXP2101Component::GetBatPower()
 {
+    ESP_LOGD(TAG, "GetBatPower");
     float VoltageLSB = 1.1;
     float CurrentLCS = 0.5;
     uint32_t ReData = Read24bit( 0x70 );
@@ -763,6 +808,7 @@ float AXP2101Component::GetBatPower()
 
 float AXP2101Component::GetBatChargeCurrent()
 {
+    ESP_LOGD(TAG, "GetBatChargeCurrent");
     float ADCLSB = 0.5;
     uint16_t ReData = Read13Bit( 0x7A );
     return ReData * ADCLSB;
@@ -770,6 +816,7 @@ float AXP2101Component::GetBatChargeCurrent()
 
 float AXP2101Component::GetAPSVoltage()
 {
+    ESP_LOGD(TAG, "GetAPSVoltage");
     float ADCLSB = 1.4  / 1000.0;
     uint16_t ReData = Read12Bit( 0x7E );
     return ReData * ADCLSB;
@@ -794,6 +841,7 @@ void AXP2101Component::SetCoulombClear()
 
 void AXP2101Component::SetLDO2( bool State )
 {
+    ESP_LOGD(TAG, "SetLDO2");
     uint8_t buf = Read8bit(0x12);
     if( State == true )
     {
@@ -808,6 +856,7 @@ void AXP2101Component::SetLDO2( bool State )
 
 void AXP2101Component::SetLDO3(bool State)
 {
+    ESP_LOGD(TAG, "SetLDO3");
     uint8_t buf = Read8bit(0x12);
     if( State == true )
     {
@@ -822,6 +871,7 @@ void AXP2101Component::SetLDO3(bool State)
 
 void AXP2101Component::SetChargeCurrent(uint8_t current)
 {
+    ESP_LOGD(TAG, "SetChargeCurrent");
     uint8_t buf = Read8bit(0x33);
     buf = (buf & 0xf0) | (current & 0x07);
     Write1Byte(0x33, buf);
@@ -831,6 +881,7 @@ void AXP2101Component::SetChargeCurrent(uint8_t current)
 
 void AXP2101Component::PowerOff()
 {
+    ESP_LOGD(TAG, "PowerOff");
     // Turn off the charging indicator to save power
     PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
 
@@ -877,10 +928,12 @@ void AXP2101Component::PowerOff()
 
 void AXP2101Component::SetAdcState(bool state)
 {
+    ESP_LOGD(TAG, "SetAdcState");
     Write1Byte(0x82, state ? 0xff : 0x00);
 }
 
 std::string AXP2101Component::GetStartupReason() {
+    ESP_LOGD(TAG, "GetStartupReason");
   esp_reset_reason_t reset_reason = ::esp_reset_reason();
   if (reset_reason == ESP_RST_DEEPSLEEP) {
     esp_sleep_source_t wake_reason = esp_sleep_get_wakeup_cause();
