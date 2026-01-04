@@ -83,7 +83,7 @@ void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
     
-    bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
+    bool result = PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
     if (result == false) {
         Serial.println("power is not online...");
