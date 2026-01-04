@@ -82,6 +82,7 @@ void AXP2101Component::toggle_backlight()
 void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
+    Serial.begin(115200);
     
     bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
