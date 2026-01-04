@@ -3,6 +3,10 @@
 #include "esphome/core/log.h"
 #include <Esp.h>
 
+#include <Wire.h>
+
+#define XPOWERS_CHIP_AXP2101
+
 #ifndef CONFIG_PMU_SDA
 #define CONFIG_PMU_SDA 21
 #endif
@@ -78,6 +82,12 @@ void AXP2101Component::toggle_backlight()
 void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
+    
+    bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
+
+    if (result == false) {
+        Serial.println("power is not online...");
+    }
     ESP_LOGCONFIG(TAG, "getID:0x%x", PMU.getChipID());
 
     // Set the minimum common working voltage of the PMU VBUS input,
