@@ -7,28 +7,28 @@
 
 #define XPOWERS_CHIP_AXP2101
 
-#ifndef CONFIG_PMU_SDA
-#define CONFIG_PMU_SDA 21
+#ifndef CONFIG_power_SDA
+#define CONFIG_power_SDA 21
 #endif
 
-#ifndef CONFIG_PMU_SCL
-#define CONFIG_PMU_SCL 22
+#ifndef CONFIG_power_SCL
+#define CONFIG_power_SCL 22
 #endif
 
-#ifndef CONFIG_PMU_IRQ
-#define CONFIG_PMU_IRQ 35
+#ifndef CONFIG_power_IRQ
+#define CONFIG_power_IRQ 35
 #endif
 
-bool  pmu_flag = 0;
-XPowersPMU PMU;
+bool  power_flag = 0;
+XPowerspower power;
 
-const uint8_t i2c_sda = CONFIG_PMU_SDA;
-const uint8_t i2c_scl = CONFIG_PMU_SCL;
-const uint8_t pmu_irq_pin = CONFIG_PMU_IRQ;
+const uint8_t i2c_sda = CONFIG_power_SDA;
+const uint8_t i2c_scl = CONFIG_power_SCL;
+const uint8_t power_irq_pin = CONFIG_power_IRQ;
 
 void setFlag(void)
 {
-    pmu_flag = true;
+    power_flag = true;
 }
 
 
@@ -42,11 +42,11 @@ void AXP2101Component::power_lcd(bool on)
     ESP_LOGD(TAG, "power_lcd");
     if (on)
     {
-        PMU.enableALDO4();
+        power.enableALDO4();
     }
     else 
     {
-        PMU.disableALDO4();
+        power.disableALDO4();
     }
 }
 
@@ -55,11 +55,11 @@ void AXP2101Component::toggle_lcd()
     ESP_LOGD(TAG, "toggle_lcd");
     if (lcd_state)
     {
-        PMU.enableALDO4();
+        power.enableALDO4();
     }
     else 
     {
-        PMU.disableALDO4();
+        power.disableALDO4();
     }
     lcd_state = !lcd_state;
 }
@@ -70,11 +70,11 @@ void AXP2101Component::toggle_backlight()
     ESP_LOGD(TAG, "toggle_backlight");
     if (backlight_state)
     {
-        PMU.enableBLDO1();
+        power.enableBLDO1();
     }
     else 
     {
-        PMU.disableBLDO1();
+        power.disableBLDO1();
     }
     backlight_state = !backlight_state;
 }
@@ -83,134 +83,134 @@ void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
     
-    bool result = PMU.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
+    bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
     if (result == false) {
         Serial.println("power is not online...");
     }
-    ESP_LOGCONFIG(TAG, "getID:0x%x", PMU.getChipID());
+    ESP_LOGCONFIG(TAG, "getID:0x%x", power.getChipID());
 
-    // Set the minimum common working voltage of the PMU VBUS input,
-    // below this value will turn off the PMU
-    PMU.setVbusVoltageLimit(XPOWERS_AXP2101_VBUS_VOL_LIM_4V36);
+    // Set the minimum common working voltage of the power VBUS input,
+    // below this value will turn off the power
+    power.setVbusVoltageLimit(XPOWERS_AXP2101_VBUS_VOL_LIM_4V36);
 
-    // Set the maximum current of the PMU VBUS input,
-    // higher than this value will turn off the PMU
-    PMU.setVbusCurrentLimit(XPOWERS_AXP2101_VBUS_CUR_LIM_1500MA);
+    // Set the maximum current of the power VBUS input,
+    // higher than this value will turn off the power
+    power.setVbusCurrentLimit(XPOWERS_AXP2101_VBUS_CUR_LIM_1500MA);
 
 
     // Get the VSYS shutdown voltage
-    uint16_t vol = PMU.getSysPowerDownVoltage();
+    uint16_t vol = power.getSysPowerDownVoltage();
     ESP_LOGCONFIG(TAG, "->  getSysPowerDownVoltage:%u", vol);
 
     // Set VSY off voltage as 2600mV , Adjustment range 2600mV ~ 3300mV
-    PMU.setSysPowerDownVoltage(2600);
+    power.setSysPowerDownVoltage(2600);
 
-    vol = PMU.getSysPowerDownVoltage();
+    vol = power.getSysPowerDownVoltage();
     ESP_LOGCONFIG(TAG, "->  getSysPowerDownVoltage:%u", vol);
 
 
     // DC1 IMAX=2A
     // 1500~3400mV,100mV/step,20steps
-    PMU.setDC1Voltage(3300);
-    ESP_LOGCONFIG(TAG, "DC1  : %s   Voltage:%u mV",  PMU.isEnableDC1()  ? "+" : "-", PMU.getDC1Voltage());
+    power.setDC1Voltage(3300);
+    ESP_LOGCONFIG(TAG, "DC1  : %s   Voltage:%u mV",  power.isEnableDC1()  ? "+" : "-", power.getDC1Voltage());
 
     // DC2 IMAX=2A
     // 500~1200mV  10mV/step,71steps
     // 1220~1540mV 20mV/step,17steps
-    PMU.setDC2Voltage(1000);
-    ESP_LOGCONFIG(TAG, "DC2  : %s   Voltage:%u mV",  PMU.isEnableDC2()  ? "+" : "-", PMU.getDC2Voltage());
+    power.setDC2Voltage(1000);
+    ESP_LOGCONFIG(TAG, "DC2  : %s   Voltage:%u mV",  power.isEnableDC2()  ? "+" : "-", power.getDC2Voltage());
 
     // DC3 IMAX = 2A
     // 500~1200mV,10mV/step,71steps
     // 1220~1540mV,20mV/step,17steps
     // 1600~3400mV,100mV/step,19steps
-    PMU.setDC3Voltage(3300);
-    ESP_LOGCONFIG(TAG, "DC3  : %s   Voltage:%u mV",  PMU.isEnableDC3()  ? "+" : "-", PMU.getDC3Voltage());
+    power.setDC3Voltage(3300);
+    ESP_LOGCONFIG(TAG, "DC3  : %s   Voltage:%u mV",  power.isEnableDC3()  ? "+" : "-", power.getDC3Voltage());
 
     // DCDC4 IMAX=1.5A
     // 500~1200mV,10mV/step,71steps
     // 1220~1840mV,20mV/step,32steps
-    PMU.setDC4Voltage(1000);
-    ESP_LOGCONFIG(TAG, "DC4  : %s   Voltage:%u mV",  PMU.isEnableDC4()  ? "+" : "-", PMU.getDC4Voltage());
+    power.setDC4Voltage(1000);
+    ESP_LOGCONFIG(TAG, "DC4  : %s   Voltage:%u mV",  power.isEnableDC4()  ? "+" : "-", power.getDC4Voltage());
 
     // DC5 IMAX=2A
     // 1200mV
     // 1400~3700mV,100mV/step,24steps
-    PMU.setDC5Voltage(3300);
-    ESP_LOGCONFIG(TAG, "DC5  : %s   Voltage:%u mV",  PMU.isEnableDC5()  ? "+" : "-", PMU.getDC5Voltage());
+    power.setDC5Voltage(3300);
+    ESP_LOGCONFIG(TAG, "DC5  : %s   Voltage:%u mV",  power.isEnableDC5()  ? "+" : "-", power.getDC5Voltage());
 
     //ALDO1 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    PMU.setALDO1Voltage(3300);
+    power.setALDO1Voltage(3300);
 
     //ALDO2 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    PMU.setALDO2Voltage(3300);
+    power.setALDO2Voltage(3300);
 
     //ALDO3 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    // PMU.setALDO3Voltage(3300);
+    // power.setALDO3Voltage(3300);
 
     //ALDO4 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    PMU.setALDO4Voltage(3300);
+    power.setALDO4Voltage(3300);
 
     //BLDO1 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    PMU.setBLDO1Voltage(3300);
+    power.setBLDO1Voltage(3300);
 
     //BLDO2 IMAX=300mA
     //500~3500mV, 100mV/step,31steps
-    PMU.setBLDO2Voltage(3300);
+    power.setBLDO2Voltage(3300);
 
     //CPUSLDO IMAX=30mA
     //500~1400mV,50mV/step,19steps
-    PMU.setCPUSLDOVoltage(1000);
+    power.setCPUSLDOVoltage(1000);
 
     //DLDO1 IMAX=300mA
     //500~3400mV, 100mV/step,29steps
-    // PMU.setDLDO1Voltage(3300);
+    // power.setDLDO1Voltage(3300);
 
     //DLDO2 IMAX=300mA
     //500~1400mV, 50mV/step,2steps
-    // PMU.setDLDO2Voltage(3300);
+    // power.setDLDO2Voltage(3300);
 
 
-    // PMU.enableDC1();
-    PMU.enableDC2();
-    PMU.enableDC3();
-    PMU.enableDC4();
-    PMU.enableDC5();
-    PMU.enableALDO1();
-    PMU.enableALDO2();
-    // PMU.enableALDO3(); // This is the speaker
-    PMU.enableALDO4(); // display power
-    // PMU.enableBLDO1(); // LCD Backlight
-    PMU.enableBLDO2();
-    PMU.enableCPUSLDO();
-    // PMU.enableDLDO1(); // This is the vibration motor
-    // PMU.enableDLDO2();
+    // power.enableDC1();
+    power.enableDC2();
+    power.enableDC3();
+    power.enableDC4();
+    power.enableDC5();
+    power.enableALDO1();
+    power.enableALDO2();
+    // power.enableALDO3(); // This is the speaker
+    power.enableALDO4(); // display power
+    // power.enableBLDO1(); // LCD Backlight
+    power.enableBLDO2();
+    power.enableCPUSLDO();
+    // power.enableDLDO1(); // This is the vibration motor
+    // power.enableDLDO2();
 
 
-    ESP_LOGCONFIG(TAG, "DC1  : %s   Voltage:%u mV",  PMU.isEnableDC1()  ? "+" : "-", PMU.getDC1Voltage());
-    ESP_LOGCONFIG(TAG, "DC2  : %s   Voltage:%u mV",  PMU.isEnableDC2()  ? "+" : "-", PMU.getDC2Voltage());
-    ESP_LOGCONFIG(TAG, "DC3  : %s   Voltage:%u mV",  PMU.isEnableDC3()  ? "+" : "-", PMU.getDC3Voltage());
-    ESP_LOGCONFIG(TAG, "DC4  : %s   Voltage:%u mV",  PMU.isEnableDC4()  ? "+" : "-", PMU.getDC4Voltage());
-    ESP_LOGCONFIG(TAG, "DC5  : %s   Voltage:%u mV",  PMU.isEnableDC5()  ? "+" : "-", PMU.getDC5Voltage());
-    ESP_LOGCONFIG(TAG, "ALDO1: %s   Voltage:%u mV",  PMU.isEnableALDO1()  ? "+" : "-", PMU.getALDO1Voltage());
-    ESP_LOGCONFIG(TAG, "ALDO2: %s   Voltage:%u mV",  PMU.isEnableALDO2()  ? "+" : "-", PMU.getALDO2Voltage());
-    ESP_LOGCONFIG(TAG, "ALDO3: %s   Voltage:%u mV",  PMU.isEnableALDO3()  ? "+" : "-", PMU.getALDO3Voltage());
-    ESP_LOGCONFIG(TAG, "ALDO4: %s   Voltage:%u mV",  PMU.isEnableALDO4()  ? "+" : "-", PMU.getALDO4Voltage());
-    ESP_LOGCONFIG(TAG, "BLDO1: %s   Voltage:%u mV",  PMU.isEnableBLDO1()  ? "+" : "-", PMU.getBLDO1Voltage());
-    ESP_LOGCONFIG(TAG, "BLDO2: %s   Voltage:%u mV",  PMU.isEnableBLDO2()  ? "+" : "-", PMU.getBLDO2Voltage());
-    ESP_LOGCONFIG(TAG, "CPUSLDO: %s Voltage:%u mV",  PMU.isEnableCPUSLDO() ? "+" : "-", PMU.getCPUSLDOVoltage());
-    ESP_LOGCONFIG(TAG, "DLDO1: %s   Voltage:%u mV",  PMU.isEnableDLDO1()  ? "+" : "-", PMU.getDLDO1Voltage());
-    ESP_LOGCONFIG(TAG, "DLDO2: %s   Voltage:%u mV",  PMU.isEnableDLDO2()  ? "+" : "-", PMU.getDLDO2Voltage());
+    ESP_LOGCONFIG(TAG, "DC1  : %s   Voltage:%u mV",  power.isEnableDC1()  ? "+" : "-", power.getDC1Voltage());
+    ESP_LOGCONFIG(TAG, "DC2  : %s   Voltage:%u mV",  power.isEnableDC2()  ? "+" : "-", power.getDC2Voltage());
+    ESP_LOGCONFIG(TAG, "DC3  : %s   Voltage:%u mV",  power.isEnableDC3()  ? "+" : "-", power.getDC3Voltage());
+    ESP_LOGCONFIG(TAG, "DC4  : %s   Voltage:%u mV",  power.isEnableDC4()  ? "+" : "-", power.getDC4Voltage());
+    ESP_LOGCONFIG(TAG, "DC5  : %s   Voltage:%u mV",  power.isEnableDC5()  ? "+" : "-", power.getDC5Voltage());
+    ESP_LOGCONFIG(TAG, "ALDO1: %s   Voltage:%u mV",  power.isEnableALDO1()  ? "+" : "-", power.getALDO1Voltage());
+    ESP_LOGCONFIG(TAG, "ALDO2: %s   Voltage:%u mV",  power.isEnableALDO2()  ? "+" : "-", power.getALDO2Voltage());
+    ESP_LOGCONFIG(TAG, "ALDO3: %s   Voltage:%u mV",  power.isEnableALDO3()  ? "+" : "-", power.getALDO3Voltage());
+    ESP_LOGCONFIG(TAG, "ALDO4: %s   Voltage:%u mV",  power.isEnableALDO4()  ? "+" : "-", power.getALDO4Voltage());
+    ESP_LOGCONFIG(TAG, "BLDO1: %s   Voltage:%u mV",  power.isEnableBLDO1()  ? "+" : "-", power.getBLDO1Voltage());
+    ESP_LOGCONFIG(TAG, "BLDO2: %s   Voltage:%u mV",  power.isEnableBLDO2()  ? "+" : "-", power.getBLDO2Voltage());
+    ESP_LOGCONFIG(TAG, "CPUSLDO: %s Voltage:%u mV",  power.isEnableCPUSLDO() ? "+" : "-", power.getCPUSLDOVoltage());
+    ESP_LOGCONFIG(TAG, "DLDO1: %s   Voltage:%u mV",  power.isEnableDLDO1()  ? "+" : "-", power.getDLDO1Voltage());
+    ESP_LOGCONFIG(TAG, "DLDO2: %s   Voltage:%u mV",  power.isEnableDLDO2()  ? "+" : "-", power.getDLDO2Voltage());
 
     // Set the time of pressing the button to turn off
-    PMU.setPowerKeyPressOffTime(XPOWERS_POWEROFF_4S);
-    uint8_t opt = PMU.getPowerKeyPressOffTime();
+    power.setPowerKeyPressOffTime(XPOWERS_POWEROFF_4S);
+    uint8_t opt = power.getPowerKeyPressOffTime();
     switch (opt) {
     case XPOWERS_POWEROFF_4S:
         ESP_LOGCONFIG(TAG, "PowerKeyPressOffTime: 4 Second");
@@ -228,8 +228,8 @@ void AXP2101Component::setup()
         break;
     }
     // Set the button power-on press time
-    PMU.setPowerKeyPressOnTime(XPOWERS_POWERON_128MS);
-    opt = PMU.getPowerKeyPressOnTime();
+    power.setPowerKeyPressOnTime(XPOWERS_POWERON_128MS);
+    opt = power.getPowerKeyPressOnTime();
     switch (opt) {
     case XPOWERS_POWERON_128MS:
         ESP_LOGCONFIG(TAG, "PowerKeyPressOnTime: 128 Ms");
@@ -250,66 +250,66 @@ void AXP2101Component::setup()
     bool en;
 
     // DCDC 120%(130%) high voltage turn off PMIC function
-    en = PMU.getDCHighVoltagePowerDownEn();
+    en = power.getDCHighVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDCHighVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
     // DCDC1 85% low voltage turn off PMIC function
-    en = PMU.getDC1LowVoltagePowerDownEn();
+    en = power.getDC1LowVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDC1LowVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
     // DCDC2 85% low voltage turn off PMIC function
-    en = PMU.getDC2LowVoltagePowerDownEn();
+    en = power.getDC2LowVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDC2LowVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
     // DCDC3 85% low voltage turn off PMIC function
-    en = PMU.getDC3LowVoltagePowerDownEn();
+    en = power.getDC3LowVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDC3LowVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
     // DCDC4 85% low voltage turn off PMIC function
-    en = PMU.getDC4LowVoltagePowerDownEn();
+    en = power.getDC4LowVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDC4LowVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
     // DCDC5 85% low voltage turn off PMIC function
-    en = PMU.getDC5LowVoltagePowerDownEn();
+    en = power.getDC5LowVoltagePowerDownEn();
     ESP_LOGCONFIG(TAG, "getDC5LowVoltagePowerDownEn: %s", en ? "ENABLE" : "DISABLE");
 
-    // PMU.setDCHighVoltagePowerDown(true);
-    // PMU.setDC1LowVoltagePowerDown(true);
-    // PMU.setDC2LowVoltagePowerDown(true);
-    // PMU.setDC3LowVoltagePowerDown(true);
-    // PMU.setDC4LowVoltagePowerDown(true);
-    // PMU.setDC5LowVoltagePowerDown(true);
+    // power.setDCHighVoltagePowerDown(true);
+    // power.setDC1LowVoltagePowerDown(true);
+    // power.setDC2LowVoltagePowerDown(true);
+    // power.setDC3LowVoltagePowerDown(true);
+    // power.setDC4LowVoltagePowerDown(true);
+    // power.setDC5LowVoltagePowerDown(true);
 
     // It is necessary to disable the detection function of the TS pin on the board
     // without the battery temperature detection function, otherwise it will cause abnormal charging
-    PMU.disableTSPinMeasure();
+    power.disableTSPinMeasure();
 
-    PMU.enableTemperatureMeasure();
+    power.enableTemperatureMeasure();
 
     // Enable internal ADC detection
-    PMU.enableBattDetection();
-    PMU.enableVbusVoltageMeasure();
-    PMU.enableBattVoltageMeasure();
-    PMU.enableSystemVoltageMeasure();
+    power.enableBattDetection();
+    power.enableVbusVoltageMeasure();
+    power.enableBattVoltageMeasure();
+    power.enableSystemVoltageMeasure();
 
 
     /*
-      The default setting is CHGLED is automatically controlled by the PMU.
+      The default setting is CHGLED is automatically controlled by the power.
     - XPOWERS_CHG_LED_OFF,
     - XPOWERS_CHG_LED_BLINK_1HZ,
     - XPOWERS_CHG_LED_BLINK_4HZ,
     - XPOWERS_CHG_LED_ON,
     - XPOWERS_CHG_LED_CTRL_CHG,
     * */
-    // PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+    // power.setChargingLedMode(XPOWERS_CHG_LED_OFF);
 
 
     // Force add pull-up
-    pinMode(pmu_irq_pin, INPUT_PULLUP);
-    attachInterrupt(pmu_irq_pin, setFlag, FALLING);
+    pinMode(power_irq_pin, INPUT_PULLUP);
+    attachInterrupt(power_irq_pin, setFlag, FALLING);
 
 
     // Disable all interrupts
-    PMU.disableIRQ(XPOWERS_AXP2101_ALL_IRQ);
+    power.disableIRQ(XPOWERS_AXP2101_ALL_IRQ);
     // Clear all interrupt flags
-    PMU.clearIrqStatus();
+    power.clearIrqStatus();
     // Enable the required interrupt function
-    PMU.enableIRQ(
+    power.enableIRQ(
         XPOWERS_AXP2101_BAT_INSERT_IRQ    | XPOWERS_AXP2101_BAT_REMOVE_IRQ      |   //BATTERY
         XPOWERS_AXP2101_VBUS_INSERT_IRQ   | XPOWERS_AXP2101_VBUS_REMOVE_IRQ     |   //VBUS
         XPOWERS_AXP2101_PKEY_SHORT_IRQ    | XPOWERS_AXP2101_PKEY_LONG_IRQ       |   //POWER KEY
@@ -318,38 +318,38 @@ void AXP2101Component::setup()
     );
 
     // Set the precharge charging current
-    PMU.setPrechargeCurr(XPOWERS_AXP2101_PRECHARGE_50MA);
+    power.setPrechargeCurr(XPOWERS_AXP2101_PRECHARGE_50MA);
     // Set constant current charge current limit
-    PMU.setChargerConstantCurr(XPOWERS_AXP2101_CHG_CUR_200MA);
+    power.setChargerConstantCurr(XPOWERS_AXP2101_CHG_CUR_200MA);
     // Set stop charging termination current
-    PMU.setChargerTerminationCurr(XPOWERS_AXP2101_CHG_ITERM_25MA);
+    power.setChargerTerminationCurr(XPOWERS_AXP2101_CHG_ITERM_25MA);
 
     // Set charge cut-off voltage
-    PMU.setChargeTargetVoltage(XPOWERS_AXP2101_CHG_VOL_4V1);
+    power.setChargeTargetVoltage(XPOWERS_AXP2101_CHG_VOL_4V1);
 
     // Set the watchdog trigger event type
-    PMU.setWatchdogConfig(XPOWERS_AXP2101_WDT_IRQ_TO_PIN);
+    power.setWatchdogConfig(XPOWERS_AXP2101_WDT_IRQ_TO_PIN);
     // Set watchdog timeout
-    PMU.setWatchdogTimeout(XPOWERS_AXP2101_WDT_TIMEOUT_4S);
+    power.setWatchdogTimeout(XPOWERS_AXP2101_WDT_TIMEOUT_4S);
     // Enable watchdog to trigger interrupt event
-    PMU.enableWatchdog();
+    power.enableWatchdog();
 
-    // PMU.disableWatchdog();
+    // power.disableWatchdog();
 
     // Enable Button Battery charge
-    PMU.enableButtonBatteryCharge();
+    power.enableButtonBatteryCharge();
 
     // Set Button Battery charge voltage
-    PMU.setButtonBatteryChargeVoltage(3300);
+    power.setButtonBatteryChargeVoltage(3300);
 }
 
 // Screen enable
 void AXP2101Component::set_lcd_enabled(bool on) {
     ESP_LOGD(TAG, "set_lcd_enabled");
     if (on) {
-        PMU.enableBLDO1();  // backlight on
+        power.enableBLDO1();  // backlight on
     } else {
-        PMU.disableBLDO1(); // backlight off only
+        power.disableBLDO1(); // backlight off only
     }
 }
 
@@ -357,9 +357,9 @@ void AXP2101Component::set_lcd_enabled(bool on) {
 void AXP2101Component::set_blue_led(bool on) {
     ESP_LOGD(TAG, "set_blue_led");
   if (on) {
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_ON);
+    power.setChargingLedMode(XPOWERS_CHG_LED_ON);
   } else {
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+    power.setChargingLedMode(XPOWERS_CHG_LED_OFF);
   }
 }
 
@@ -367,9 +367,9 @@ void AXP2101Component::set_blue_led(bool on) {
 void AXP2101Component::set_speaker_enabled(bool on) {
     ESP_LOGD(TAG, "set_speaker_enabled");
     if (on) {
-        PMU.enableALDO3();  // speaker on
+        power.enableALDO3();  // speaker on
     } else {
-        PMU.disableALDO3(); // speaker off
+        power.disableALDO3(); // speaker off
     }
 }
 
@@ -392,16 +392,16 @@ void AXP2101Component::update() {
     ESP_LOGD(TAG, "update");
 
     if (this->batterylevel_sensor_ != nullptr) {
-      float vbat = PMU.getBattVoltage();
+      float vbat = power.getBattVoltage();
       ESP_LOGD(TAG, "Got Battery Voltage=%f", vbat);
       this->batteryvoltage_sensor_->publish_state(vbat / 1000.);
 
-      // The battery percentage may be inaccurate at first use, the PMU will automatically
+      // The battery percentage may be inaccurate at first use, the power will automatically
       // learn the battery curve and will automatically calibrate the battery percentage
       // after a charge and discharge cycle
       float batterylevel;
-      if (PMU.isBatteryConnect()) {
-        batterylevel = PMU.getBatteryPercent();
+      if (power.isBatteryConnect()) {
+        batterylevel = power.getBatteryPercent();
       } else {
         batterylevel = 100.0 * ((vbat - 3.0) / (4.1 - 3.0));
       }
@@ -414,7 +414,7 @@ void AXP2101Component::update() {
     }
 
     if (this->batterycharging_bsensor_ != nullptr) {
-      bool vcharging = PMU.isCharging();
+      bool vcharging = power.isCharging();
 
       ESP_LOGD(TAG, "Got Battery Charging=%s", vcharging ? "true" : "false");
       this->batterycharging_bsensor_->publish_state(vcharging);
@@ -513,7 +513,7 @@ void AXP2101Component::UpdateBrightness() {
 
     if (brightness_ <= 0.0f) {
         ESP_LOGD(TAG, "Brightness zero; disabling BLDO1");
-        PMU.disableBLDO1();
+        power.disableBLDO1();
         return;
     }
 
@@ -893,42 +893,42 @@ void AXP2101Component::PowerOff()
 {
     ESP_LOGD(TAG, "PowerOff");
     // Turn off the charging indicator to save power
-    PMU.setChargingLedMode(XPOWERS_CHG_LED_OFF);
+    power.setChargingLedMode(XPOWERS_CHG_LED_OFF);
 
     // Turn off ADC data monitoring to save power
-    PMU.disableTemperatureMeasure();
+    power.disableTemperatureMeasure();
     // Enable internal ADC detection
-    PMU.disableBattDetection();
-    PMU.disableVbusVoltageMeasure();
-    PMU.disableBattVoltageMeasure();
-    PMU.disableSystemVoltageMeasure();
+    power.disableBattDetection();
+    power.disableVbusVoltageMeasure();
+    power.disableBattVoltageMeasure();
+    power.disableSystemVoltageMeasure();
 
 
-    // Enable PMU sleep
-    PMU.enableSleep();
+    // Enable power sleep
+    power.enableSleep();
 
     // Turn off the power output of other channels
-    PMU.disableDC2();
-    PMU.disableDC3();
-    PMU.disableDC4();
-    PMU.disableDC5();
-    PMU.disableALDO1();
-    PMU.disableALDO2();
-    PMU.disableALDO3();
-    PMU.disableALDO4();
-    PMU.disableBLDO1();
-    PMU.disableBLDO2();
-    PMU.disableCPUSLDO();
-    PMU.disableDLDO1();
-    PMU.disableDLDO2();
+    power.disableDC2();
+    power.disableDC3();
+    power.disableDC4();
+    power.disableDC5();
+    power.disableALDO1();
+    power.disableALDO2();
+    power.disableALDO3();
+    power.disableALDO4();
+    power.disableBLDO1();
+    power.disableBLDO2();
+    power.disableCPUSLDO();
+    power.disableDLDO1();
+    power.disableDLDO2();
 
-    // Clear PMU Interrupt Status Register
-    PMU.clearIrqStatus();
+    // Clear power Interrupt Status Register
+    power.clearIrqStatus();
 
     // Send IRQ wakeup command
-    PMU.enableWakeup();
+    power.enableWakeup();
     // Set ESP32 to wake up externally
-    esp_sleep_enable_ext0_wakeup((gpio_num_t )pmu_irq_pin, LOW);
+    esp_sleep_enable_ext0_wakeup((gpio_num_t )power_irq_pin, LOW);
 
     // Enable ESP32 sleep
     esp_deep_sleep_start();
