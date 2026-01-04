@@ -85,8 +85,8 @@ void AXP2101Component::setup()
     
     bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
-    if (result == false) {
-        Serial.println("power is not online...");
+    if (!result) {
+        ESP_LOGD(TAG, "power is not online...");
     }
     ESP_LOGCONFIG(TAG, "getID:0x%x", power.getChipID());
 
