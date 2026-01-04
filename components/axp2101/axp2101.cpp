@@ -88,6 +88,7 @@ void AXP2101Component::setup()
     if (!result) {
         ESP_LOGD(TAG, "power is not online...");
     }
+    ESP_LOGD(TAG, "setup: power.begin called successfully");
     ESP_LOGCONFIG(TAG, "getID:0x%x", power.getChipID());
 
     // Set the minimum common working voltage of the power VBUS input,
