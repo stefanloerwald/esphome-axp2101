@@ -7,9 +7,10 @@
 #include "esphome/core/component.h"
 
 #define XPOWERS_CHIP_AXP2101
+#define AXP2101_ADDR 0x34
+
 #include "XPowersLib.h"
 
-#define AXP2101_ADDR 0x34
 
 namespace esphome {
 namespace axp2101 {
