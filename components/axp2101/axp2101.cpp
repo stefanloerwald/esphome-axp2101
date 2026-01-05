@@ -83,7 +83,7 @@ void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
     
-    bool result = power.begin(Wire, i2c_sda, i2c_scl, AXP2101_SLAVE_ADDRESS);
+    bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
     if (!result) {
         ESP_LOGD(TAG, "power is not online...");
