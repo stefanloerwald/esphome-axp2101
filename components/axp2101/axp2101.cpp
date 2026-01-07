@@ -83,12 +83,12 @@ void AXP2101Component::setup()
 {
     ESP_LOGD(TAG, "setup");
     
-    bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
+    //bool result = power.begin(Wire, AXP2101_SLAVE_ADDRESS, i2c_sda, i2c_scl);
 
-    if (!result) {
-        ESP_LOGD(TAG, "power is not online...");
-    }
-    ESP_LOGD(TAG, "setup: power.begin called successfully");
+    //if (!result) {
+    //    ESP_LOGD(TAG, "power is not online...");
+    //}
+    //ESP_LOGD(TAG, "setup: power.begin called successfully");
     ESP_LOGCONFIG(TAG, "getID:0x%x", power.getChipID());
 
     // Set the minimum common working voltage of the power VBUS input,
