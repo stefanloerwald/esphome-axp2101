@@ -386,7 +386,7 @@ void AXP2101Component::dump_config() {
 
 float AXP2101Component::get_setup_priority() const { 
     ESP_LOGD(TAG, "get_setup_priority");
-    return setup_priority::DATA; 
+    return setup_priority::HARDWARE; 
 }
 
 void AXP2101Component::update() {
